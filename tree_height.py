@@ -2,6 +2,7 @@
 
 import sys
 import threading
+import os
 
 class Node:
     def __init__(self, parent=None):
@@ -28,21 +29,35 @@ def compute_height(n, parents):
 
     return get_height(root)
 
+def get_input():
+    source = input("Enter input type (I for keyboard input, F for file input): ")
+    while source.upper() not in ['I', 'F']:
+        source = input("Enter a valid input type (I for keyboard input, F for file input): ")
+    if source.upper() == 'I':
+        n = int(input("Enter the number of nodes: "))
+        parents = list(map(int, input("Enter the parents of each node (space-separated): ").split()))
+        return n, parents
+    elif source.upper() == 'F':
+        while True:
+            file_name = input("Enter the file name: ")
+            if "a" in file_name.lower():
+                print("File name cannot contain the letter 'a'.")
+            else:
+                break
+        try:
+            with open(os.path.join("folder", file_name)) as f:
+                input_lines = f.readlines()
+        except FileNotFoundError:
+            print("Error: file not found.")
+            return
+        n = int(input_lines[0])
+        parents = list(map(int, input_lines[1].strip().split()))
+        return n, parents
+
 def main():
-    # Get input from user
-    file_name = input("Enter file name: ")
-    while file_name.lower() == "" or "a" in file_name.lower():
-        file_name = input("Enter valid file name: ")
-
-    try:
-        with open(f"folder/{file_name}") as f:
-            input_lines = f.readlines()
-    except:
-        print("Error: file not found.")
+    n, parents = get_input()
+    if not parents:
         return
-
-    n = int(input_lines[0])
-    parents = list(map(int, input_lines[1].strip().split()))
 
     print(compute_height(n, parents))
 
@@ -52,3 +67,4 @@ def main():
 sys.setrecursionlimit(10**7)  # max depth of recursion
 threading.stack_size(2**27)   # new thread will get stack of such size
 threading.Thread(target=main).start()
+
