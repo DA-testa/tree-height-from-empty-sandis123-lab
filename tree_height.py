@@ -3,7 +3,17 @@
 import sys
 import threading
 
-
+class nodes:
+    def__init__(self, parent, child=None):
+        
+        self.parent = parent
+        self.child = child
+        
+     def addChild(self, node):
+        if self.child is None:
+            self.child = []
+        self.child.append(node)
+        
 def compute_height(n, parents):
     # Write this function
     max_height = 0
