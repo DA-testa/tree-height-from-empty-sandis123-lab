@@ -28,7 +28,8 @@ def compute_height(n, parents):
             return 1 + max(get_height(child) for child in node.children)
 
     return get_height(root)
-
+    if not os.path.exists("folder"):
+    os.makedirs("folder")
 def get_input():
     source = input("Enter input type (I for keyboard input, F for file input): ")
     while source.upper() not in ['I', 'F']:
