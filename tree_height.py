@@ -9,12 +9,12 @@ def compute_height(n, parents):
     max_height = 0
     # Your code here
     for vertex in range(n):
-        height=0
+        height = 0
         current=vertex
         while current != -1:
             height += 1
-        while current=parents[current]
-    max_height = max(max_height, height)
+            current = parents[current]
+        max_height = max(max_height, height)
     return max_height
 
 
