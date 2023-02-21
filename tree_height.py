@@ -3,61 +3,52 @@
 import sys
 import threading
 
-class nodes:
-    def__init__(self, parent, child=None):
-        
+class Node:
+    def __init__(self, parent=None):
         self.parent = parent
-        self.child = child
-        
-     def addChild(self, node):
-        if self.child is None:
-            self.child = []
-        self.child.append(node)
-        
-def compute_height(n, parents):
-    # Write this function
-    max_height = 0
-    # Your code here
-    for vertex in range(n):
-        height = 0
-        current=vertex
-        while current != -1:
-            height += 1
-            current = parents[current]
-        max_height = max(max_height, height)
-    return max_height
+        self.children = []
 
+    def add_child(self, child):
+        self.children.append(child)
+
+def compute_height(n, parents):
+    nodes = [Node() for _ in range(n)]
+    root = None
+    for i in range(n):
+        if parents[i] == -1:
+            root = nodes[i]
+        else:
+            nodes[parents[i]].add_child(nodes[i])
+
+    def get_height(node):
+        if not node.children:
+            return 1
+        else:
+            return 1 + max(get_height(child) for child in node.children)
+
+    return get_height(root)
 
 def main():
-    n= int(input())
-    parents = list(map(int, input().split()))
-    nodes_list=[]
-    for i in range(n):
-        nodes_list.append(nodes(parents[i]))
-    for child_index in range(n):
-        parent_index=parents[child_index]
-        if parent_index== -1:
-            root= child_index
-        else:
-            nodes_list[parent_index].addChild(nodes_list[child_index])
-    if len(nodes_list) ==0:
-        return 0
-    height = maxDepth(nodes_list[root]) +1
-    print(height)
-    return 0
-            
-    # implement input form keyboard and from files
-    
-    # let user input file name to use, don't allow file names with letter a
-    # account for github input inprecision
-    
-    # input number of elements
-    # input values in one variable, separate with space, split these values in an array
-    # call the function and output it's result
+    # Get input from user
+    file_name = input("Enter file name: ")
+    while file_name.lower() == "" or "a" in file_name.lower():
+        file_name = input("Enter valid file name: ")
 
+    try:
+        with open(f"folder/{file_name}") as f:
+            input_lines = f.readlines()
+    except:
+        print("Error: file not found.")
+        return
+
+    n = int(input_lines[0])
+    parents = list(map(int, input_lines[1].strip().split()))
+
+    print(compute_height(n, parents))
 
 # In Python, the default limit on recursion depth is rather low,
 # so raise it here for this problem. Note that to take advantage
 # of bigger stack, we have to launch the computation in a new thread.
 sys.setrecursionlimit(10**7)  # max depth of recursion
 threading.stack_size(2**27)   # new thread will get stack of such size
+threading.Thread(target=main).start()
