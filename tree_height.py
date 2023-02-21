@@ -1,5 +1,6 @@
 import sys
 import threading
+import os
 
 class Node:
     def __init__(self, parent=None):
@@ -32,13 +33,13 @@ def main():
     while file_name.lower() == "" or "a" in file_name.lower():
         file_name = input("Enter valid file name: ")
 
-    
-    try:
-        with open(f"folder/{file_name}") as f:
-            input_lines = f.readlines()
-    except:
+    file_path = os.path.join("folder", file_name)
+    if not os.path.exists(file_path):
         print("Error: file not found.")
         return
+
+    with open(file_path) as f:
+        input_lines = f.readlines()
 
     n = int(input_lines[0])
     parents = list(map(int, input_lines[1].strip().split()))
