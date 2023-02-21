@@ -1,3 +1,4 @@
+#python 3
 import sys
 import threading
 import os
@@ -35,25 +36,25 @@ def get_input():
     while source.upper() not in ['I', 'F']:
         source = input("Enter a valid input type (I for keyboard input, F for file input): ")
     if source.upper() == 'I':
-    n = int(input("Enter the number of nodes: "))
-    parents = list(map(int, input("Enter the parents of each node (space-separated): ").split()))
-    return n, parents
-elif source.upper() == 'F':
-    while True:
-        file_name = input("Enter the file name: ")
-        if "a" in file_name.lower():
-            print("File name cannot contain the letter 'a'.")
-        else:
-            break
+        n = int(input("Enter the number of nodes: "))
+        parents = list(map(int, input("Enter the parents of each node (space-separated): ").split()))
+        return n, parents
+    elif source.upper() == 'F':
+        while True:
+            file_name = input("Enter the file name: ")
+            if "a" in file_name.lower():
+                print("File name cannot contain the letter 'a'.")
+            else:
+                break
         try:
             with open(os.path.join("folder", file_name)) as f:
                 input_lines = f.readlines()
         except FileNotFoundError:
             print("Error: file not found.")
-           return None, None
-    n = int(input_lines[0])
-    parents = list(map(int, input_lines[1].strip().split()))
-    return n, parents
+            return None, None
+        n = int(input_lines[0])
+        parents = list(map(int, input_lines[1].strip().split()))
+        return n, parents
 
 def main():
     n, parents = get_input()
@@ -68,4 +69,3 @@ def main():
 sys.setrecursionlimit(10**7)  # max depth of recursion
 threading.stack_size(2**27)   # new thread will get stack of such size
 threading.Thread(target=main).start()
-
