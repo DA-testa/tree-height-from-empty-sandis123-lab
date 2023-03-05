@@ -2,69 +2,53 @@ import sys
 import threading
 import os
 
-if not os.path.exists("folder"):
-    os.makedirs("folder")
-
-
 class Node:
-    def __init__(self, parent=None):
-        self.parent = parent
+    def __init__(self, value):
+        self.value = value
         self.children = []
 
-    def add_child(self, child):
-        self.children.append(child)
-
-
-def compute_height(n, parents):
-    nodes = [Node() for _ in range(n)]
+def build_tree(parents):
+    nodes = [Node(i) for i in range(len(parents))]
     root = None
-    for i in range(n):
-        if parents[i] == -1:
+    for i, parent in enumerate(parents):
+        if parent == -1:
             root = nodes[i]
         else:
-            nodes[parents[i]].add_child(nodes[i])
+            nodes[parent].children.append(nodes[i])
+    return root
 
-    def get_height(node):
-        if not node.children:
-            return 1
-        else:
-            return 1 + max(get_height(child) for child in node.children)
+def get_tree_height(root):
+    if not root:
+        return 0
+    height = 0
+    for child in root.children:
+        height = max(height, get_tree_height(child))
+    return height + 1
 
-    return get_height(root)
-
-
-def get_input():
-    source = input("Enter input type (I for keyboard input, F for file input): ")
-    while source.upper() not in ['I', 'F']:
-        source = input("Enter a valid input type (I for keyboard input, F for file input): ")
-    if source.upper() == 'I':
+def read_input():
+    input_type = input("Enter input type (F/f for file, K/k for keyboard): ")
+    if input_type.lower() == 'f':
+        file_name = input("Enter file name: ")
+        while 'a' in file_name:
+            print("Invalid file name. Please enter a different file name.")
+            file_name = input("Enter file name: ")
+        file_path = os.path.join(os.getcwd(), 'input', file_name)
+        with open(file_path, 'r') as f:
+            n = int(f.readline().strip())
+            parents = [int(x) for x in f.readline().split()]
+    elif input_type.lower() == 'k':
         n = int(input("Enter the number of nodes: "))
-        parents = list(map(int, input("Enter the parents of each node (space-separated): ").split()))
-        return n, parents
-    elif source.upper() == 'F':
-        while True:
-            file_name = input("Enter the file name: ")
-            if "a" in file_name.lower():
-                print("File name cannot contain the letter 'a'.")
-            else:
-                break
-        try:
-            with open(os.path.join("folder", file_name)) as f:
-                input_lines = f.readlines()
-        except FileNotFoundError:
-            print("Error: file not found.")
-            return None, None
-        n = int(input_lines[0])
-        parents = list(map(int, input_lines[1].strip().split()))
-        return n, parents
+        parents = [int(x) for x in input("Enter the parents of each node separated by space: ").split()]
+    else:
+        print("Invalid input type. Please enter F/f for file or K/k for keyboard.")
+        n, parents = None, None
+    return n, parents
 
-
-def main():
-    n, parents = get_input()
-    if not parents:
-        return
-
-    print(compute_height(n, parents))
+if __name__ == '__main__':
+    n, parents = read_input()
+    root = build_tree(parents)
+    height = get_tree_height(root)
+    print("Height of the tree:", height)
 
 
 # In Python, the default limit on recursion depth is rather low,
