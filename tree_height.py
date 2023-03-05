@@ -1,30 +1,45 @@
-# python3
-
+#python3
 import sys
 import threading
+import numpy
 
+def compute_depth(node, children):
+    if not children[node]:
+        return 1
+    max_depth = 0
+    for child in children[node]:
+        depth = compute_depth(child, children)
+        max_depth = max(max_depth, depth)
+    return max_depth + 1
 
 def compute_height(n, parents):
-    # Write this function
-    max_height = 0
-    # Your code here
-    return max_height
-
+    children = [[] for _ in range(n)]
+    for i in range(n):
+        parent = parents[i]
+        if parent == -1:
+            root = i
+        else:
+            children[parent].append(i)
+    return compute_depth(root, children)
 
 def main():
-    # implement input form keyboard and from files
-    
-    # let user input file name to use, don't allow file names with letter a
-    # account for github input inprecision
-    
-    # input number of elements
-    # input values in one variable, separate with space, split these values in an array
-    # call the function and output it's result
+    input_type = input()
+    if 'I' in input_type:
+        n = int(input())
+        parents = list(map(int, input().split()))
+        height = compute_height(n, parents)
+        print(height)
+    elif 'F' in input_type:
+        filename = input()
+        with open("test/" +filename, 'r') as f:
+            n = int(f.readline())
+            parents = list(map(int, f.readline().split()))
+            height = compute_height(n,parents)
+            print(height)
+    else:
+        print("error")
+        exit()
 
-
-# In Python, the default limit on recursion depth is rather low,
-# so raise it here for this problem. Note that to take advantage
-# of bigger stack, we have to launch the computation in a new thread.
-sys.setrecursionlimit(10**7)  # max depth of recursion
-threading.stack_size(2**27)   # new thread will get stack of such size
+sys.setrecursionlimit(10**7)  
+threading.stack_size(2**27)   
 threading.Thread(target=main).start()
