@@ -3,52 +3,48 @@ import threading
 import os
 
 class Node:
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, data):
+        self.data = data
         self.children = []
 
 def build_tree(parents):
     nodes = [Node(i) for i in range(len(parents))]
     root = None
-    for i, parent in enumerate(parents):
-        if parent == -1:
+
+    for i in range(len(parents)):
+        if parents[i] == -1:
             root = nodes[i]
         else:
-            nodes[parent].children.append(nodes[i])
+            nodes[parents[i]].children.append(nodes[i])
+
     return root
 
-def get_tree_height(root):
-    if not root:
-        return 0
-    height = 0
-    for child in root.children:
-        height = max(height, get_tree_height(child))
-    return height + 1
-
-def read_input():
-    input_type = input("Enter input type (F/f for file, K/k for keyboard): ")
-    if input_type.lower() == 'f':
-        file_name = input("Enter file name: ")
-        while 'a' in file_name:
-            print("Invalid file name. Please enter a different file name.")
-            file_name = input("Enter file name: ")
-        file_path = os.path.join(os.getcwd(), 'input', file_name)
-        with open(file_path, 'r') as f:
-            n = int(f.readline().strip())
-            parents = [int(x) for x in f.readline().split()]
-    elif input_type.lower() == 'k':
-        n = int(input("Enter the number of nodes: "))
-        parents = [int(x) for x in input("Enter the parents of each node separated by space: ").split()]
-    else:
-        print("Invalid input type. Please enter F/f for file or K/k for keyboard.")
-        n, parents = None, None
-    return n, parents
-
 if __name__ == '__main__':
-    n, parents = read_input()
+    input_type = input("Enter input type (F/f for file, K/k for keyboard): ")
+
+    if input_type.lower() == 'f':
+        filename = input("Enter filename: ")
+        with open(filename) as f:
+            n = int(f.readline())
+            parents = list(map(int, f.readline().split()))
+    else:
+        n = int(input("Enter number of nodes: "))
+        parents = list(map(int, input("Enter parent of each node: ").split()))
+
     root = build_tree(parents)
-    height = get_tree_height(root)
-    print("Height of the tree:", height)
+
+    def height(node):
+        if node is None:
+            return 0
+
+        child_heights = []
+        for child in node.children:
+            child_heights.append(height(child))
+
+        return 1 + max(child_heights)
+
+    print(height(root))
+
 
 
 # In Python, the default limit on recursion depth is rather low,
